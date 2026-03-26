@@ -1,0 +1,241 @@
+// =============================================================================
+// Muammo Xarita — Prisma Schema
+// PostgreSQL datasource | Production-ready
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+/// RBAC Rollari
+enum Role {
+  user         // Oddiy fuqaro — muammo bildirishi mumkin
+  admin        // To'liq huquq — hamma narsani boshqara oladi
+  organization // Tashkilot — o'ziga biriktirilgan muammolar statusini o'zgartira oladi
+  moderator    // Moderator — noto'g'ri kontentni o'chira oladi
+}
+
+/// Muammo holati
+enum ProblemStatus {
+  new          // Yangi bildirилdi (default)
+  open         // Qabul qilindi
+  in_progress  // Jarayonda
+  resolved     // Hal qilindi
+  rejected     // Rad etildi
+}
+
+/// Muammo muhimligi
+enum Priority {
+  low
+  medium
+  high
+  critical
+}
+
+/// Muammo toifasi (AI tomonidan aniqlanadi)
+enum Category {
+  garbage
+  road
+  electricity
+  water
+  parks
+  safety
+  other
+}
+
+// =============================================================================
+// ORGANIZATION — Shahar xizmatlari tashkilotlari
+// Har bir toifadagi muammolar tegishli tashkilotga yo'naltiriladi
+// =============================================================================
+model Organization {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(255)
+  /// O'zbekcha nomi
+  name_uz     String?   @db.VarChar(255)
+  /// Tashkilot qaysi toifadagi muammolarni hal qiladi (unique)
+  category    String    @unique @db.VarChar(100)
+  email       String?   @db.VarChar(255)
+  phone       String?   @db.VarChar(50)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  /// Tashkilotga tegishli muammolar
+  problems    Problem[]
+  /// Tashkilot xodimlari
+  members     User[]
+
+  @@map("organizations")
+}
+
+// =============================================================================
+// USER — Tizim foydalanuvchilari
+// Ro'yxatdan o'tish, kirish, muammo bildirish va ovoz berish uchun
+// =============================================================================
+model User {
+  id             String       @id @default(uuid()) @db.Uuid
+  name           String       @db.VarChar(255)
+  email          String       @unique @db.VarChar(255)
+  /// bcrypt bilan hash qilingan parol
+  password_hash  String       @db.VarChar(255)
+  role           Role         @default(user)
+  /// Foydalanuvchi qaysi tashkilotga tegishli (org_member uchun)
+  organization_id String?     @db.Uuid
+  avatar_url     String?      @db.Text
+  phone          String?      @db.VarChar(50)
+  /// Foydalanuvchi istiqomat qiladigan tuman
+  district       String?      @db.VarChar(100)
+  /// Hisob faol yoki bloklanganmi
+  is_active      Boolean      @default(true)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  organization   Organization? @relation(fields: [organization_id], references: [id], onDelete: SetNull)
+  /// Foydalanuvchi bildirgan muammolar
+  problems       Problem[]
+  /// Foydalanuvchi bergan ovozlar
+  votes          Vote[]
+  /// Foydalanuvchi yozgan izohlar
+  comments       Comment[]
+  /// Foydalanuvchiga yuborilgan bildirishnomalar
+  notifications  Notification[]
+
+  @@index([email])
+  @@index([organization_id])
+  @@map("users")
+}
+
+// =============================================================================
+// PROBLEM — Shahar muammolari
+// Fuqarolar tomonidan bildiriladigan muammolar. AI tomonidan tasniflanadi.
+// =============================================================================
+model Problem {
+  id               String        @id @default(uuid()) @db.Uuid
+  title            String        @db.VarChar(500)
+  description      String        @db.Text
+  /// AI tomonidan avtomatik aniqlanadigan toifa
+  category         Category?     @default(other)
+  /// Muammo hozirgi holati (kuzatiladigan va yangilanaladigan)
+  status           ProblemStatus @default(new)
+  /// AI yoki admin tomonidan beriladigan muhimlik darajasi
+  priority         Priority      @default(medium)
+  /// Geografik koordinatalar
+  latitude         Decimal       @db.Decimal(10, 8)
+  longitude        Decimal       @db.Decimal(11, 8)
+  /// Insoniy o'qish uchun manzil matni
+  address          String?       @db.Text
+  /// Cloudinary rasm URL
+  image_url        String?       @db.Text
+  /// Cloudinary public ID (o'chirish uchun)
+  image_public_id  String?       @db.Text
+  /// OpenAI tahlili natijasi (JSON: category, priority, tags, summary, confidence, ...)
+  ai_analysis      Json?
+  /// Muammo bildirilgan foydalanuvchi
+  user_id          String        @db.Uuid
+  /// AI yo'naltirgan tashkilot
+  organization_id  String?       @db.Uuid
+  /// Muammo hal qilingan vaqt
+  resolved_at      DateTime?
+  /// Admin/tashkilot tomonidan yozilgan hal qilish izohi
+  resolution_note  String?       @db.Text
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user             User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  organization     Organization? @relation(fields: [organization_id], references: [id], onDelete: SetNull)
+  votes            Vote[]
+  comments         Comment[]
+  notifications    Notification[]
+
+  @@index([user_id])
+  @@index([organization_id])
+  @@index([category])
+  @@index([status])
+  @@index([latitude, longitude])
+  @@index([createdAt])
+  @@map("problems")
+}
+
+// =============================================================================
+// VOTE — Muammolarga ovozlar
+// Har bir foydalanuvchi bitta muammoga bitta marta ovoz bera oladi
+// =============================================================================
+model Vote {
+  id         String   @id @default(uuid()) @db.Uuid
+  problem_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  problem    Problem  @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  /// Bir foydalanuvchi bir muammoga faqat bir marta ovoz bera oladi
+  @@unique([problem_id, user_id])
+  @@index([problem_id])
+  @@index([user_id])
+  @@map("votes")
+}
+
+// =============================================================================
+// COMMENT — Muammo izohlari
+// Fuqarolar va tashkilot xodimlari izoh qoldirishi mumkin
+// =============================================================================
+model Comment {
+  id         String   @id @default(uuid()) @db.Uuid
+  problem_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  content    String   @db.Text
+  /// Tashkilot/admin tomonidan rasmiy izohmi
+  is_official Boolean @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  problem    Problem  @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([problem_id])
+  @@index([user_id])
+  @@map("comments")
+}
+
+// =============================================================================
+// NOTIFICATION — Foydalanuvchi bildirishnomalari
+// Muammo holati o'zgarganda, izoh qo'shilganda yoki tashkilot javob berganda
+// =============================================================================
+model Notification {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  /// Bildirishnoma matni (masalan: "Muammongiz 'in_progress' holatiga o'tdi")
+  message    String   @db.Text
+  /// O'qilganmi
+  is_read    Boolean  @default(false)
+  /// Qaysi muammoga bog'liq (ixtiyoriy)
+  problem_id String?  @db.Uuid
+  /// Bildirishnoma turi: status_change, new_comment, org_response, vote_milestone
+  type       String?  @db.VarChar(50)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  problem    Problem? @relation(fields: [problem_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([is_read])
+  @@index([createdAt])
+  @@map("notifications")
+}
