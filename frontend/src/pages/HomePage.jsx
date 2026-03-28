@@ -20,7 +20,7 @@ export default function HomePage() {
   }, [filters])
 
   const openCount = problems.filter(p => p.status === 'open').length
-  const solvedCount = problems.filter(p => p.status === 'solved').length
+  const solvedCount = problems.filter(p => p.status === 'resolved').length
 
   return (
     <Layout fullHeight>

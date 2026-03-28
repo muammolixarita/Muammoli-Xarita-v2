@@ -11,7 +11,7 @@ export const CATEGORIES = {
 export const STATUSES = {
   open:        { label: 'Ochiq',           labelEn: 'Open',        color: 'amber'  },
   in_progress: { label: 'Jarayonda',       labelEn: 'In Progress', color: 'blue'   },
-  solved:      { label: 'Hal qilindi',     labelEn: 'Solved',      color: 'green'  },
+  resolved:      { label: 'Hal qilindi',     labelEn: 'Solved',      color: 'green'  },
   rejected:    { label: 'Rad etildi',      labelEn: 'Rejected',    color: 'red'    },
 }
 

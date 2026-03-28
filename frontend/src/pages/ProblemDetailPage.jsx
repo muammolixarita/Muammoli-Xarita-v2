@@ -383,10 +383,10 @@ function AdminStatusChanger({ problemId, currentStatus, problemTitle }) {
   const statusConfig = {
     open:        { label: 'Ochiq',        color: 'text-amber-400 border-amber-500/40 bg-amber-500/10' },
     in_progress: { label: 'Jarayonda',    color: 'text-blue-400 border-blue-500/40 bg-blue-500/10' },
-    solved:      { label: 'Hal qilindi',  color: 'text-brand-400 border-brand-500/40 bg-brand-500/10' },
+    resolved:      { label: 'Hal qilindi',  color: 'text-brand-400 border-brand-500/40 bg-brand-500/10' },
     rejected:    { label: 'Rad etildi',   color: 'text-red-400 border-red-500/40 bg-red-500/10' },
   }
-  const dots = { open: '🟡', in_progress: '🔵', solved: '🟢', rejected: '🔴' }
+  const dots = { open: '🟡', in_progress: '🔵', resolved: '🟢', rejected: '🔴' }
 
   return (
     <div className="mb-5">

@@ -8,7 +8,7 @@ export default function StatusBadge({ status, size = 'sm' }) {
   if (!s) return null   // unknown status from server, don't show garbage
 
   const sizeClass = size === 'lg' ? 'text-sm px-3 py-1' : 'text-xs px-2 py-0.5'
-  const dots = { open: '🟡', in_progress: '🔵', solved: '🟢', rejected: '🔴' }
+  const dots = { open: '🟡', in_progress: '🔵', resolved: '🟢', rejected: '🔴' }
 
   return (
     <span className={`badge ${getStatusStyle(status)} ${sizeClass}`}>
