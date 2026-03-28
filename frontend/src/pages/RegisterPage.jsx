@@ -6,8 +6,8 @@ import Layout from '../components/layout/Layout'
 import { useAuth } from '../context/AuthContext'
 
 const DISTRICTS = [
-  "Yangibozor",'Yunusabad', 'Chilonzor', 'Shayxontohur', 'Mirzo Ulug\'bek', 'Yakkasaroy',
-  'Hamza', 'Olmazar', 'Bektemir', 'Sergeli', 'Uchtepa', 'Yashnobod', 'Mirobod',
+  "Bogʻot",'Gurlan', 'Hazorasp', 'Qoʻshkoʻpir', 'Shovot', 'Urganch',
+  'Xiva', 'Xonqa', 'Yangiariq', 'Yangibozor','Urganch shahri','Xiva shahri'
 ]
 
 export default function RegisterPage() {
