@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import rateLimit from 'express-rate-limit';
 
 import authRoutes          from './routes/auth.js';
 import problemsRoutes      from './routes/problems.js';
@@ -15,6 +16,25 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import prisma from './lib/prisma.js';
 
 dotenv.config();
+
+// ─── Rate Limiters ────────────────────────────────────────────────────────────
+// Login/Register: 1 daqiqada 10 urinish
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: "Juda ko'p urinish. 1 daqiqa kutib qayta urining." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Umumiy API: 1 daqiqada 100 so'rov
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: "Juda ko'p so'rov. Biroz kutib qayta urining." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app  = express();
@@ -31,12 +51,12 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
 // Routes
-app.use('/api/auth',          authRoutes);
-app.use('/api/problems',      problemsRoutes);
-app.use('/api/organizations', organizationsRoutes);
-app.use('/api/notifications', notificationsRoutes);
-app.use('/api/admin',         adminRoutes);    // ADMIN only
-app.use('/api/org',           orgRoutes);      // ORGANIZATION only
+app.use('/api/auth',          authLimiter, authRoutes);  // Login/Register himoyasi
+app.use('/api/problems',      apiLimiter,  problemsRoutes);
+app.use('/api/organizations', apiLimiter,  organizationsRoutes);
+app.use('/api/notifications', apiLimiter,  notificationsRoutes);
+app.use('/api/admin',         apiLimiter,  adminRoutes);
+app.use('/api/org',           apiLimiter,  orgRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
