@@ -110,6 +110,13 @@ export default function Navbar() {
                 <Icon size={15} />{label}
               </Link>
             ))}
+
+             {isAuthenticated && (
+        <div className="px-3 py-2">
+          <NotificationBell />
+        </div>
+      )}
+
             {isAuthenticated
               ? <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-surface-800 transition-all">
                   <LogOut size={15} /> Chiqish
