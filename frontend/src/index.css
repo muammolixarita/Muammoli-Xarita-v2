@@ -136,11 +136,11 @@
   cursor: pointer !important;
   accent-color: #22c55e !important;
 }
-
+/* 
 .leaflet-control-zoom,
 .leaflet-control-layers {
-  z-index: 300 !important;
-}
+  z-index: 400 !important;
+} */
 
 /* Status badge colors */
 .status-open { @apply bg-amber-500/15 text-amber-400 border border-amber-500/20; }
