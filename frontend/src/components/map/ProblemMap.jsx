@@ -92,7 +92,8 @@ function LocateMe() {
   }
 
   return (
-    <div className="leaflet-top leaflet-left" style={{ marginTop: 80 }}>
+    // <div className="leaflet-top leaflet-left" style={{ marginTop: 80 }}>  eski
+    <div className="leaflet-top leaflet-left" style={{ marginTop: 80, zIndex: 400 }}>
       <div className="leaflet-control">
         <button
           onClick={locate}
