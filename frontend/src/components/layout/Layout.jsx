@@ -6,7 +6,9 @@ export default function Layout({ children, fullHeight = false }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className={`flex-1 ${fullHeight ? 'pt-16 flex flex-col' : 'pt-16'}`}>
+      {/* <main className={`flex-1 ${fullHeight ? 'pt-16 flex flex-col' : 'pt-16'}`}> */}
+      <main className={`flex-1 ${fullHeight ? 'pt-16 flex flex-col' : 'pt-16'}`}
+  style={fullHeight ? { position: 'relative', zIndex: 0 } : {}}>
         {children}
       </main>
       {!fullHeight && <Footer />}
