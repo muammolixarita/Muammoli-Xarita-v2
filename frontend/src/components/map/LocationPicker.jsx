@@ -8,7 +8,7 @@ const { BaseLayer } = LayersControl
 const pinIcon = L.divIcon({
   html: `<svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
     <path d="M16 0C7.163 0 0 7.163 0 16c0 10 16 24 16 24s16-14 16-24C32 7.163 24.837 0 16 0z" fill="#22c55e"/>
-    <circle cx="16" cy="16" r="7" fill="white"/>
+    <circle cx="16" cy="16" r="7" fill="blue"/>
     <circle cx="16" cy="16" r="4" fill="#22c55e"/>
   </svg>`,
   className:  '',
