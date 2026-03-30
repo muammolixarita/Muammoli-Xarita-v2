@@ -139,7 +139,7 @@
 
 .leaflet-control-zoom,
 .leaflet-control-layers {
-  z-index: 400 !important;
+  z-index: 450 !important;
 }
 
 /* Status badge colors */
