@@ -2,6 +2,7 @@ import { validationResult } from 'express-validator';
 import prisma from '../lib/prisma.js';
 import { categorizeAndAnalyzeProblem } from '../utils/aiService.js';
 import { STATUS_PERMISSIONS } from '../middleware/auth.js';
+import { uploadToSupabase } from '../config/upload.js';
 
 // ─── Shared select objects ────────────────────────────────────────────────────
 const problemSelect = {
@@ -136,9 +137,16 @@ export const createProblem = async (req, res, next) => {
 
     const { title, description, latitude, longitude, address } = req.body;
     // Lokal saqlash: fayl nomi dan URL yasash
-    const image_url       = req.file ? `${process.env.BACKEND_URL || 'http://localhost:' + (process.env.PORT || 5000)}/uploads/${req.file.filename}` : null;
-    const image_public_id = req.file?.filename ?? null;
-
+    // Supabase Storage ga yuklash
+let image_url       = null;
+let image_public_id = null;
+if (req.file) {
+  const uploaded = await uploadToSupabase(req.file);
+  if (uploaded) {
+    image_url       = uploaded.url;
+    image_public_id = uploaded.filename;
+  }
+}
     console.log('🤖 AI tahlil boshlandi...');
     const ai = await categorizeAndAnalyzeProblem(title, description, image_url);
 
