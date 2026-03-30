@@ -99,7 +99,9 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden glass border-b border-surface-800/60 animate-fade-in">
+        // <div className="md:hidden glass border-b border-surface-800/60 animate-fade-in"> eski
+          <div className="md:hidden glass border-b border-surface-800/60 animate-fade-in" 
+       style={{ position: 'relative', zIndex: 1001 }}>
           <div className="px-4 py-3 flex flex-col gap-1">
             {navLinks.map(({ to, label, icon: Icon, highlight }) => (
               <Link key={to + label} to={to} onClick={() => setOpen(false)}
