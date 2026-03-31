@@ -142,6 +142,16 @@
   z-index: 400 !important;
 } */
 
+/* Mobil: xarita kontrollari navbar ostida qolsin */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400 !important;
+}
+
+.leaflet-control-container {
+  z-index: 400 !important;
+}
+
 /* Status badge colors */
 .status-open { @apply bg-amber-500/15 text-amber-400 border border-amber-500/20; }
 .status-in_progress { @apply bg-blue-500/15 text-blue-400 border border-blue-500/20; }

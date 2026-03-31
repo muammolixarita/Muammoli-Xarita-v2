@@ -28,7 +28,7 @@ export default function Navbar() {
   const roleMeta = user ? ROLE_META[user.role] : null
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[1000] h-16">
+    <header className="fixed top-0 left-0 right-0 z-[2000] h-16">
       <div className="glass h-full border-b border-surface-800/60">
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
 
@@ -100,8 +100,8 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden glass border-b border-surface-800/60 animate-fade-in"> 
-      {/* //     <div className="md:hidden glass border-b border-surface-800/60 animate-fade-in" 
-      //  style={{ position: 'relative', zIndex: 1001 }}> */}
+      // {/* //     <div className="md:hidden glass border-b border-surface-800/60 animate-fade-in" 
+      // //  style={{ position: 'relative', zIndex: 1001 }}> */}
           <div className="px-4 py-3 flex flex-col gap-1">
             {navLinks.map(({ to, label, icon: Icon, highlight }) => (
               <Link key={to + label} to={to} onClick={() => setOpen(false)}
